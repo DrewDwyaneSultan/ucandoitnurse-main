@@ -22,8 +22,14 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
     webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Helper to create Resend client when needed
+function getResendClient() {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+        throw new Error("Missing RESEND_API_KEY environment variable");
+    }
+    return new Resend(apiKey);
+}
 
 interface UserWithDueCards {
     id: string;
@@ -150,7 +156,8 @@ export async function GET(request: NextRequest) {
 
             // 2. Send Email
             try {
-                await resend.emails.send({
+                const resendClient = getResendClient();
+            await resendClient.emails.send({
                     from: "HLY Study <reminders@hly.app>",
                     to: userData.email,
                     subject: title,
