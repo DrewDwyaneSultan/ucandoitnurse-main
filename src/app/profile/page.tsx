@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
-import { getUserCredits, getUserSubscription, PLAN_CONFIGS, type UserCredits, type SubscriptionPlan } from "@/lib/credits";
 import {
     ArrowLeft,
     AtSign,
@@ -27,18 +26,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import type { UserProfile } from "@/types/database.types";
 
-interface Subscription {
-    plan: SubscriptionPlan;
-    status: string;
-    current_period_end: string;
-}
 
 export default function ProfilePage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [credits, setCredits] = useState<UserCredits | null>(null);
-    const [subscription, setSubscription] = useState<Subscription | null>(null);
     const [stats, setStats] = useState({ books: 0, flashcards: 0, sessions: 0 });
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
@@ -76,15 +68,7 @@ export default function ProfilePage() {
                 setSelectedAvatar(profileData.avatar_url || null);
             }
 
-            // Fetch credits and subscription
-            const [userCredits, userSub] = await Promise.all([
-                getUserCredits(user.id),
-                getUserSubscription(user.id),
-            ]);
-            setCredits(userCredits);
-            if (userSub && userSub.status === "active") {
-                setSubscription(userSub as Subscription);
-            }
+            // subscription/credits logic removed - not needed any more
 
             // Fetch stats
             const [booksRes, flashcardsRes, sessionsRes] = await Promise.all([
@@ -165,7 +149,6 @@ export default function ProfilePage() {
 
     if (!user) return null;
 
-    const planConfig = credits ? PLAN_CONFIGS[credits.plan] : null;
 
     return (
         <div className="min-h-screen bg-[#FDFBF9]">
@@ -315,65 +298,6 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        {/* Subscription Card */}
-                        <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-5 sm:p-8">
-                            <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <Gem className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                                </div>
-                                <h3 className="text-base sm:text-lg font-caladea text-gray-900">Subscription</h3>
-                            </div>
-
-                            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl mb-3 sm:mb-4">
-                                <div>
-                                    <p className="text-xs text-gray-500 font-poppins mb-0.5 sm:mb-1">Current Plan</p>
-                                    <p className="text-lg sm:text-xl font-caladea text-gray-900">
-                                        {planConfig?.name || "Free"}
-                                    </p>
-                                </div>
-                                <span className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium font-poppins ${credits?.plan === "free"
-                                    ? "bg-gray-200 text-gray-700"
-                                    : "bg-[#5B79A6] text-white"
-                                    }`}>
-                                    {credits?.plan === "free" ? "Free" : "Active"}
-                                </span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                                <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl">
-                                    <p className="text-xs text-gray-500 font-poppins mb-0.5 sm:mb-1">Credits Today</p>
-                                    <p className="text-xl sm:text-2xl font-caladea text-gray-900">
-                                        {credits?.creditsRemaining || 0}
-                                        <span className="text-xs sm:text-sm text-gray-500">/{credits?.creditsLimit || 0}</span>
-                                    </p>
-                                </div>
-                                {subscription ? (
-                                    <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl">
-                                        <p className="text-xs text-gray-500 font-poppins mb-0.5 sm:mb-1">Renews</p>
-                                        <p className="text-base sm:text-lg font-caladea text-gray-900">
-                                            {formatDate(subscription.current_period_end)}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="p-3 sm:p-4 bg-gray-50 rounded-xl sm:rounded-2xl">
-                                        <p className="text-xs text-gray-500 font-poppins mb-0.5 sm:mb-1">Resets</p>
-                                        <p className="text-base sm:text-lg font-caladea text-gray-900">Daily</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {credits?.plan === "free" && (
-                                <Button
-                                    onClick={() => {
-                                        toast.info("All features are free to use.");
-                                    }}
-                                    className="w-full mt-3 sm:mt-4 rounded-full h-11 sm:h-12 bg-gray-900 text-white font-poppins text-sm sm:text-base"
-                                >
-                                    <ArrowUpRight className="w-4 h-4 mr-2" />
-                                    Upgrade Plan
-                                </Button>
-                            )}
-                        </div>
 
                         {/* Stats Card */}
                         <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-5 sm:p-8">

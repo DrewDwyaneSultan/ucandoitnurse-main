@@ -11,29 +11,26 @@ interface ModelSelectorProps {
     onModelChange: (model: AIModelId) => void;
     disabled?: boolean;
     variant?: "light" | "dark";
-    userPlan?: "free" | "starter" | "pro" | "unlimited";
     onUpgradeClick?: () => void;
 }
 
 // Models that require Pro or Unlimited subscription
-const PREMIUM_MODELS: AIModelId[] = ["gemini-3-flash-preview"];
+// premium model gating removed, all models unlocked
 
 export function ModelSelector({
     selectedModel,
     onModelChange,
     disabled,
     variant = "light",
-    userPlan = "free",
     onUpgradeClick
 }: ModelSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const currentModel = AI_MODELS.find(m => m.id === selectedModel) || AI_MODELS.find(m => m.id === DEFAULT_MODEL) || AI_MODELS[0];
 
-    const isPremiumPlan = userPlan === "pro" || userPlan === "unlimited";
     const isDark = variant === "dark";
 
     const isModelLocked = (modelId: AIModelId) => {
-        return PREMIUM_MODELS.includes(modelId) && !isPremiumPlan;
+        return false; // no locks, all models available
     };
 
     const handleModelSelect = (modelId: AIModelId) => {
@@ -174,13 +171,7 @@ export function ModelSelector({
                                                             Default
                                                         </span>
                                                     )}
-                                                    {isLocked && (
-                                                        <span className="text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded font-poppins font-medium flex items-center gap-1">
-                                                            <Lock className="w-2.5 h-2.5" />
-                                                            Upgrade
-                                                        </span>
-                                                    )}
-                                                </div>
+                                                                </div>
                                                 <p className={`text-sm font-poppins ${isSelected ? "text-white/70" : "text-gray-500"
                                                     }`}>
                                                     {isLocked

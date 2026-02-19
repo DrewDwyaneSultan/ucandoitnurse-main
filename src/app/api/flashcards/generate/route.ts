@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { createEmbedding, generateFlashcards, type AIModelId, DEFAULT_MODEL } from "@/lib/genkit";
-import { getUserCredits, consumeCredit } from "@/lib/credits";
+// credits removed; everything is free now
 import type { ChunkMatch } from "@/types/database.types";
 
 export const runtime = "nodejs";
@@ -47,22 +47,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // ============================================
-        // CREDIT CHECK - Check if user has credits
-        // ============================================
-        const credits = await getUserCredits(userId, supabase); // Pass service role client
-
-        if (credits.creditsRemaining <= 0) {
-            return NextResponse.json(
-                {
-                    error: "NO_CREDITS",
-                    message: "You've used all your daily credits. Upgrade your plan to continue.",
-                    creditsRemaining: 0,
-                    plan: credits.plan,
-                },
-                { status: 402 } // 402 Payment Required
-            );
-        }
+        // credits are not enforced; all users can generate freely
 
         // Step 1: Generate embedding for the topic query
         const queryEmbedding = await createEmbedding(topic);
@@ -140,22 +125,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // ============================================
-        // USE CREDIT - Deduct 1 credit after successful generation
-        // ============================================
-        const creditResult = await consumeCredit(userId, "flashcard_generation", {
-            bookId,
-            topic,
-            cardsGenerated: savedCards?.length || 0,
-        }, supabase); // Pass service role client
-
         return NextResponse.json({
             success: true,
             flashcards: savedCards,
             topic,
             count: savedCards?.length || 0,
             message: `Generated ${savedCards?.length || 0} flashcards for "${topic}"`,
-            creditsRemaining: creditResult.creditsRemaining,
         });
     } catch (error) {
         console.error("Generate error:", error);

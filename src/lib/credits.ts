@@ -94,96 +94,17 @@ export const PLAN_CONFIGS = {
  * @param supabaseClient - Optional Supabase client (use service role client from server-side code to bypass RLS)
  */
 export async function getUserCredits(
-    userId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    supabaseClient?: any
+    userId: string
 ): Promise<UserCredits> {
-    // Use provided client or fall back to default (anon key)
-    const db = supabaseClient || supabase;
-
-    if (!userId) {
-        return getDefaultCredits("free");
-    }
-
-    try {
-        // First, check if user has credits record
-        const { data: existingCredits, error: creditsError } = await db
-            .from("user_credits")
-            .select("*")
-            .eq("user_id", userId)
-            .single();
-
-        // Get user's subscription
-        const { data: subscription } = await db
-            .from("user_subscriptions")
-            .select("plan, status")
-            .eq("user_id", userId)
-            .eq("status", "active")
-            .single();
-
-        const plan = (subscription?.plan || "free") as SubscriptionPlan;
-        const planConfig = PLAN_CONFIGS[plan];
-        const today = new Date().toISOString().split("T")[0];
-
-        // If no credits record exists, create one
-        if (creditsError || !existingCredits) {
-            const { error: insertError } = await db
-                .from("user_credits")
-                .upsert({
-                    user_id: userId,
-                    credits_used: 0,
-                    credits_limit: planConfig.dailyCredits,
-                    reset_date: today,
-                });
-
-            if (insertError) {
-                console.error("Error creating credits:", insertError);
-            }
-
-            return {
-                creditsUsed: 0,
-                creditsLimit: planConfig.dailyCredits,
-                creditsRemaining: planConfig.dailyCredits,
-                resetDate: today,
-                plan,
-            };
-        }
-
-        // Check if credits need to be reset (new day)
-        const lastReset = existingCredits.reset_date;
-        if (lastReset !== today) {
-            // Reset credits for new day
-            await db
-                .from("user_credits")
-                .update({
-                    credits_used: 0,
-                    credits_limit: planConfig.dailyCredits,
-                    reset_date: today,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq("user_id", userId);
-
-            return {
-                creditsUsed: 0,
-                creditsLimit: planConfig.dailyCredits,
-                creditsRemaining: planConfig.dailyCredits,
-                resetDate: today,
-                plan,
-            };
-        }
-
-        // Return current credits
-        return {
-            creditsUsed: existingCredits.credits_used,
-            creditsLimit: planConfig.dailyCredits,
-            creditsRemaining: Math.max(0, planConfig.dailyCredits - existingCredits.credits_used),
-            resetDate: existingCredits.reset_date,
-            plan,
-        };
-    } catch (error) {
-        console.error("Error in getUserCredits:", error);
-        return getDefaultCredics("free");
-    }
+    // Pricing removed: always return unlimited/free credits
+    const today = new Date().toISOString().split("T")[0];
+    return {
+        creditsUsed: 0,
+        creditsLimit: Number.MAX_SAFE_INTEGER,
+        creditsRemaining: Number.MAX_SAFE_INTEGER,
+        resetDate: today,
+        plan: "unlimited",
+    };
 }
 
 function getDefaultCredits(plan: SubscriptionPlan): UserCredits {
@@ -200,8 +121,8 @@ function getDefaultCredits(plan: SubscriptionPlan): UserCredits {
  * Check if user has credits available (without using them)
  */
 export async function hasCreditsAvailable(userId: string): Promise<boolean> {
-    const credits = await getUserCredits(userId);
-    return credits.creditsRemaining > 0;
+    // always true now that everything is free
+    return true;
 }
 
 /**
@@ -217,105 +138,20 @@ export async function consumeCredit(
     userId: string,
     actionType: string = "flashcard_generation",
     metadata: Record<string, unknown> = {},
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    supabaseClient?: any
 ): Promise<UseCreditsResult> {
-    // Use provided client or fall back to default (anon key)
-    const db = supabaseClient || supabase;
-
+    // no-op: always succeed and return huge remaining
     if (!userId) {
-        return {
-            success: false,
-            creditsRemaining: 0,
-            message: "User not authenticated",
-        };
+        return { success: false, creditsRemaining: 0, message: "User not authenticated" };
     }
-
-    try {
-        // Get current credits (pass the same client)
-        const credits = await getUserCredits(userId, db);
-
-        // Check if user has credits
-        if (credits.creditsRemaining <= 0) {
-            return {
-                success: false,
-                creditsRemaining: 0,
-                message: "No credits remaining. Please upgrade your plan.",
-            };
-        }
-
-        // Deduct credit
-        const { error: updateError } = await db
-            .from("user_credits")
-            .update({
-                credits_used: credits.creditsUsed + 1,
-                updated_at: new Date().toISOString(),
-            })
-            .eq("user_id", userId);
-
-        if (updateError) {
-            console.error("Error updating credits:", updateError);
-            return {
-                success: false,
-                creditsRemaining: credits.creditsRemaining,
-                message: "Failed to use credit. Please try again.",
-            };
-        }
-
-        // Log the usage for analytics
-        await db.from("credit_usage").insert({
-            user_id: userId,
-            action_type: actionType,
-            credits_consumed: 1,
-            metadata,
-        });
-
-        return {
-            success: true,
-            creditsRemaining: credits.creditsRemaining - 1,
-            message: "Credit used successfully.",
-        };
-    } catch (error) {
-        console.error("Error in useCredit:", error);
-        return {
-            success: false,
-            creditsRemaining: 0,
-            message: "An error occurred. Please try again.",
-        };
-    }
+    return { success: true, creditsRemaining: Number.MAX_SAFE_INTEGER, message: "Credit used successfully" };
 }
 
 /**
  * Check if user can upload more books based on their plan
  */
 export async function canUploadBook(userId: string): Promise<{ allowed: boolean; message: string; currentCount: number; limit: number }> {
-    const credits = await getUserCredits(userId);
-    const planConfig = PLAN_CONFIGS[credits.plan];
-
-    // Count user's current books
-    const { count, error } = await supabase
-        .from("books")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId);
-
-    const currentCount = count || 0;
-    const limit = planConfig.maxBooks;
-
-    if (error) {
-        console.error("Error counting books:", error);
-        return { allowed: true, message: "OK", currentCount: 0, limit };
-    }
-
-    if (currentCount >= limit) {
-        return {
-            allowed: false,
-            message: `You've reached the ${planConfig.name} plan limit of ${limit} books. Upgrade to add more.`,
-            currentCount,
-            limit,
-        };
-    }
-
-    return { allowed: true, message: "OK", currentCount, limit };
+    // always allow uploads unlimited
+    return { allowed: true, message: "OK", currentCount: 0, limit: Number.MAX_SAFE_INTEGER };
 }
 
 // ============================================
@@ -326,22 +162,8 @@ export async function canUploadBook(userId: string): Promise<{ allowed: boolean;
  * Get user's subscription details
  */
 export async function getUserSubscription(userId: string) {
-    try {
-        const { data, error } = await supabase
-            .from("user_subscriptions")
-            .select("*")
-            .eq("user_id", userId)
-            .single();
-
-        if (error && error.code !== "PGRST116") {
-            console.error("Error getting subscription:", error);
-        }
-
-        return data;
-    } catch (error) {
-        console.error("Error in getUserSubscription:", error);
-        return null;
-    }
+    // subscriptions removed
+    return null;
 }
 
 /**

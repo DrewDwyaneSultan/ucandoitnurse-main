@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Empty } from "@/components/ui/empty";
 import { ModelSelector, useModelPreference } from "@/components/ui/model-selector";
-import { getUserCredits, type UserCredits } from "@/lib/credits";
+// credits logic removed, no imports needed
 import { ArrowLeft, Wand2, Loader2, Eraser, SquareStack, Star, RotateCw, CircleCheckBig } from "lucide-react";
 import {
     AlertDialog,
@@ -38,21 +38,7 @@ export default function BookDetailPage() {
     const [flashcardsLoading, setFlashcardsLoading] = useState(true);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [credits, setCredits] = useState<UserCredits | null>(null);
 
-    useEffect(() => {
-        const fetchCredits = async () => {
-            if (user) {
-                try {
-                    const userCredits = await getUserCredits(user.id);
-                    setCredits(userCredits);
-                } catch {
-                    console.log("Could not fetch credits");
-                }
-            }
-        };
-        fetchCredits();
-    }, [user]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -234,35 +220,6 @@ export default function BookDetailPage() {
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Credits Card */}
-                    {credits && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            {/* removed pricing link */}
-                                <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-gray-200 transition-colors cursor-pointer h-full">
-                                    <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4 font-poppins">
-                                        Credits
-                                    </p>
-                                    <div className="flex items-end justify-between">
-                                        <div>
-                                            <p className="text-4xl font-caladea text-gray-900">
-                                                {credits.creditsRemaining}
-                                                <span className="text-gray-300 text-2xl">
-                                                    /{credits.creditsLimit === 9999 ? "∞" : credits.creditsLimit}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <span className="text-xs font-medium text-[#5B79A6] bg-[#5B79A6]/10 px-3 py-1.5 rounded-full font-poppins">
-                                            {credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    )}
 
                     {/* Generate Card */}
                     <motion.div
@@ -282,7 +239,6 @@ export default function BookDetailPage() {
                                         onModelChange={setModel}
                                         disabled={!isReady}
                                         variant="dark"
-                                        userPlan={credits?.plan || "free"}
                                         onUpgradeClick={() => toast.info("All features free.")}
                                     />
                                 </div>

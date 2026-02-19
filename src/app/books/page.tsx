@@ -265,12 +265,34 @@ export default function BooksPage() {
                             <p className="text-gray-500 max-w-sm mx-auto mb-8 font-poppins">
                                 Start by uploading your nursing textbooks to generate flashcards and study materials.
                             </p>
-                            <Button
-                                onClick={() => setShowUpload(true)}
-                                className="rounded-full bg-gray-900 text-white px-8 py-6 hover:bg-gray-800 transition-all font-poppins"
-                            >
-                                Upload Book
-                            </Button>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button
+                                    onClick={() => setShowUpload(true)}
+                                    className="rounded-full bg-gray-900 text-white px-8 py-6 hover:bg-gray-800 transition-all font-poppins"
+                                >
+                                    Upload Book
+                                </Button>
+                                <Button
+                                    onClick={async () => {
+                                        try {
+                                            const res = await fetch('/api/demo', { method: 'POST' });
+                                            const data = await res.json();
+                                            if (res.ok) {
+                                                toast.success('Demo content added! Refreshing book list.');
+                                                fetchBooks();
+                                            } else {
+                                                toast.error(data.error || 'Could not add demo data');
+                                            }
+                                        } catch (e) {
+                                            toast.error('Network error');
+                                        }
+                                    }}
+                                    variant="outline"
+                                    className="rounded-full px-8 py-6 border-gray-900 text-gray-900 hover:bg-gray-100 transition-all font-poppins"
+                                >
+                                    Load Sample Data
+                                </Button>
+                            </div>
                         </Empty>
                     </motion.div>
                 ) : filteredBooks.length === 0 ? (
