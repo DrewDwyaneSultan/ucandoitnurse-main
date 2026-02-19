@@ -29,6 +29,18 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Pricing & Demo Data
+
+The application is now completely free – all paywalls and "upgrade" screens have been removed. You can safely ignore any code related to subscriptions.
+
+To quickly populate your database with a sample book and flashcards for demo purposes, create a `.env` file with your Supabase URL and service role key, then run:
+
+```bash
+npm run seed:demo <your-user-id>
+```
+
+Replace `<your-user-id>` with the UUID of a user (you can copy it from the Supabase auth dashboard after creating an account).
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

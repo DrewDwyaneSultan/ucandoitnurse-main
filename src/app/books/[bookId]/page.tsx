@@ -241,7 +241,7 @@ export default function BookDetailPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
                         >
-                            <Link href="/pricing">
+                            {/* removed pricing link */}
                                 <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-gray-200 transition-colors cursor-pointer h-full">
                                     <p className="text-xs font-bold tracking-widest text-gray-500 uppercase mb-4 font-poppins">
                                         Credits
@@ -283,7 +283,7 @@ export default function BookDetailPage() {
                                         disabled={!isReady}
                                         variant="dark"
                                         userPlan={credits?.plan || "free"}
-                                        onUpgradeClick={() => router.push("/pricing")}
+                                        onUpgradeClick={() => toast.info("All features free.")}
                                     />
                                 </div>
                             )}

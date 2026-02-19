@@ -21,7 +21,7 @@ export interface UseCreditsResult {
 // ============================================
 // What costs money: AI flashcard generation (Gemini API calls)
 // Avg cost per generation: ~$0.001-0.005 (very affordable)
-// Pricing strategy: Give enough value, encourage upgrade
+// Credits logic (app is now free, but this module remains for legacy reasons)
 
 export const PLAN_CONFIGS = {
     free: {

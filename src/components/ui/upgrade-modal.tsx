@@ -205,14 +205,10 @@ export function UpgradeModal({ isOpen, onClose, currentPlan = "free", creditsRem
                                 </p>
                             </div>
 
-                            {/* Pricing Cards */}
-                            <div className="px-8 md:px-12 pb-12">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <PlanCard plan="free" />
-                                    <PlanCard plan="starter" />
-                                    <PlanCard plan="pro" isPopular />
-                                    <PlanCard plan="unlimited" />
-                                </div>
+                            {/* No pricing – all features unlocked */}
+                            <div className="px-8 md:px-12 pb-12 text-center">
+                                <p className="text-lg text-gray-700">
+                                    Good news: the app is completely free now. No need to upgrade.</p>
                             </div>
 
                             {/* Footer */}

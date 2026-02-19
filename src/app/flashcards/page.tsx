@@ -64,10 +64,9 @@ function FlashcardsContent() {
 
             const data = await response.json();
 
-            // Handle NO_CREDITS error - redirect to pricing
+            // Handle NO_CREDITS error - out of credits
             if (response.status === 402 || data.error === "NO_CREDITS") {
-                toast.error("Oops, you are out of credits! Time to power up!");
-                router.push("/pricing");
+                toast.error("Oops, you are out of credits! But don't worry – everything is free now.");
                 return;
             }
 

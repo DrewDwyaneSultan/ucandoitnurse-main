@@ -16,109 +16,21 @@ interface Subscription {
 }
 
 export default function PricingPage() {
-    const { user } = useAuth();
-    const [loading, setLoading] = useState<SubscriptionPlan | null>(null);
-    const [credits, setCredits] = useState<UserCredits | null>(null);
-    const [subscription, setSubscription] = useState<Subscription | null>(null);
-    const [loadingCredits, setLoadingCredits] = useState(true);
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-    const [showManageModal, setShowManageModal] = useState(false);
-    const [targetPlan, setTargetPlan] = useState<SubscriptionPlan | null>(null);
-    const [cancelling, setCancelling] = useState(false);
-
-    useEffect(() => {
-        async function loadCredits() {
-            if (!user) {
-                setLoadingCredits(false);
-                return;
-            }
-            try {
-                const [userCredits, userSub] = await Promise.all([
-                    getUserCredits(user.id),
-                    getUserSubscription(user.id)
-                ]);
-                setCredits(userCredits);
-                if (userSub && userSub.status === "active" && userSub.plan !== "free") {
-                    setSubscription(userSub as Subscription);
-                }
-            } catch (error) {
-                console.error("Error loading credits:", error);
-            } finally {
-                setLoadingCredits(false);
-            }
-        }
-        loadCredits();
-    }, [user]);
-
-    const currentPlan = credits?.plan || "free";
-
-    const getUpgradePrice = (fromPlan: SubscriptionPlan, toPlan: SubscriptionPlan): number => {
-        const fromPrice = PLAN_CONFIGS[fromPlan].pricePHP;
-        const toPrice = PLAN_CONFIGS[toPlan].pricePHP;
-        return Math.max(0, toPrice - fromPrice);
-    };
-
-    const handlePlanClick = async (plan: SubscriptionPlan) => {
-        if (!user) {
-            toast.error("Hold up - you need to log in first!");
-            return;
-        }
-
-        if (plan === "free" || plan === currentPlan) {
-            return;
-        }
-
-        // If user has an active subscription
-        if (subscription && subscription.status === "active") {
-            const newPlanPrice = PLAN_CONFIGS[plan].pricePHP;
-            const currentPlanPrice = PLAN_CONFIGS[subscription.plan].pricePHP;
-
-            if (newPlanPrice > currentPlanPrice) {
-                // Upgrading - show upgrade modal with prorated price
-                setTargetPlan(plan);
-                setShowUpgradeModal(true);
-            } else {
-                // Downgrading - show manage modal (need to cancel first)
-                setTargetPlan(plan);
-                setShowManageModal(true);
-            }
-            return;
-        }
-
-        // No subscription - proceed to checkout
-        await proceedToCheckout(plan);
-    };
-
-    const proceedToCheckout = async (plan: SubscriptionPlan, isUpgrade: boolean = false) => {
-        setLoading(plan);
-        setShowUpgradeModal(false);
-
-        try {
-            const response = await fetch("/api/payments/create-checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId: user?.id,
-                    plan,
-                    email: user?.email,
-                    currentPlan: isUpgrade ? subscription?.plan : undefined,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || data.error) {
-                toast.error(data.error || "Hmm, something went wrong. Give it another shot!");
-                setLoading(null);
-                return;
-            }
-
-            window.location.href = data.checkoutUrl;
-        } catch (error) {
-            console.error("Payment error:", error);
-            toast.error("Oops, that didn't work. Let us try again!");
-            setLoading(null);
-        }
+    // this page used to have subscription logic, but the app is now entirely free
+    return (
+        <div className="min-h-screen flex items-center justify-center px-4">
+            <div className="max-w-xl text-center">
+                <h1 className="text-4xl font-bold mb-4">Everything's Free!</h1>
+                <p className="text-lg text-gray-600 mb-6">
+                    We removed all paywalls – feel free to explore and generate as many flashcards as you like.
+                </p>
+                <Link href="/" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                    Back to Home
+                </Link>
+            </div>
+        </div>
+    );
+}        }
     };
 
     const handleCancelSubscription = async () => {

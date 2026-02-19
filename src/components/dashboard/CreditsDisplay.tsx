@@ -68,8 +68,7 @@ export function CreditsDisplay({ userId }: CreditsDisplayProps) {
                 : "text-gray-400";
 
     return (
-        <Link href="/pricing">
-            <motion.div
+        <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full bg-white rounded-[2rem] p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all text-left group cursor-pointer"

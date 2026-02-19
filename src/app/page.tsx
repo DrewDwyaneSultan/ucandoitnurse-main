@@ -75,9 +75,7 @@ export default function Home() {
             <div className="w-24 h-10 bg-gray-200/50 animate-pulse rounded-full" />
           ) : user ? (
             <>
-              <Button onClick={() => router.push("/pricing")} variant="ghost" className="text-gray-800 hover:text-black font-medium tracking-wide hover:bg-white/40">
-                Pricing
-              </Button>
+              {/* pricing removed - app is free */}
               <Button
                 onClick={() => router.push("/dashboard")}
                 className="rounded-full bg-gray-900 text-white px-8 py-6 hover:bg-gray-800 hover:scale-105 transition-all duration-300"

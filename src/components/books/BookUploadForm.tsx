@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { UsageLimitModal, isRateLimitError } from "@/components/ui/usage-limit-modal";
 import { Upload, FileText, X, CheckCircle, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 interface BookUploadFormProps {
     userId: string;
@@ -76,38 +77,39 @@ export function BookUploadForm({ userId, onUploadComplete }: BookUploadFormProps
         setProgress(10);
 
         try {
-            // Step 1: Upload file
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("userId", userId);
-            formData.append("title", title || file.name.replace(/\.pdf$/i, ""));
+            // Step 1: Upload file directly to Supabase storage (bypass server limit)
+            const bookId = crypto.randomUUID();
+            const fileName = `${userId}/books/${bookId}.pdf`;
+            const bookTitle = title || file.name.replace(/\.pdf$/i, "");
 
-            // Vercel's serverless functions have a ~5MB body limit, so
-            // reject larger files early with a helpful message.
-            const SERVER_MAX = 5 * 1024 * 1024;
-            if (file.size > SERVER_MAX) {
-                throw new Error("File too large for serverless upload (max 5MB). Please split it or use a smaller file.");
+            const { error: uploadError } = await supabase.storage
+                .from("books")
+                .upload(fileName, file, {
+                    contentType: "application/pdf",
+                });
+
+            if (uploadError) {
+                throw new Error("Failed to upload file: " + uploadError.message);
             }
 
-            const uploadRes = await fetch("/api/books/upload", {
-                method: "POST",
-                body: formData,
-            });
+            // create book record
+            const { data: book, error: dbError } = await supabase
+                .from("books")
+                .insert({
+                    id: bookId,
+                    user_id: userId,
+                    title: bookTitle,
+                    file_path: fileName,
+                    status: "processing",
+                })
+                .select()
+                .single();
 
-            if (!uploadRes.ok) {
-                // attempt to parse JSON, fall back to text
-                let data: any;
-                const contentType = uploadRes.headers.get("content-type") || "";
-                if (contentType.includes("application/json")) {
-                    data = await uploadRes.json();
-                } else {
-                    const text = await uploadRes.text();
-                    data = { error: text };
-                }
-                throw new Error(data.error || "Upload failed");
+            if (dbError || !book) {
+                await supabase.storage.from("books").remove([fileName]);
+                throw new Error("Failed to create book record: " + (dbError?.message || "unknown"));
             }
 
-            const { book } = await uploadRes.json();
             setProgress(33);
             setStep("processing");
 
@@ -352,8 +354,8 @@ export function BookUploadForm({ userId, onUploadComplete }: BookUploadFormProps
                 isOpen={showLimitModal}
                 onClose={() => setShowLimitModal(false)}
                 onUpgrade={() => {
-                    // TODO: Navigate to pricing/upgrade page
-                    window.open("/pricing", "_blank");
+                    // no pricing page anymore – all features are free
+                    toast.info("All features are free – just upload your PDF!");
                 }}
             />
         </div>

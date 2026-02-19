@@ -364,7 +364,9 @@ export default function ProfilePage() {
 
                             {credits?.plan === "free" && (
                                 <Button
-                                    onClick={() => router.push("/pricing")}
+                                    onClick={() => {
+                                        toast.info("All features are free to use.");
+                                    }}
                                     className="w-full mt-3 sm:mt-4 rounded-full h-11 sm:h-12 bg-gray-900 text-white font-poppins text-sm sm:text-base"
                                 >
                                     <ArrowUpRight className="w-4 h-4 mr-2" />
