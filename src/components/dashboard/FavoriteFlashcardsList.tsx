@@ -34,11 +34,18 @@ export function FavoriteFlashcardsList({ userId }: FavoriteFlashcardsListProps) 
             } catch (error) {
                 console.error("Error fetching favorites:", error);
                 // Log detailed fields from Supabase error objects for debugging
-                console.error("error.message:", (error as any)?.message);
-                console.error("error.details:", (error as any)?.details);
-                console.error("error.hint:", (error as any)?.hint);
-                console.error("error.code:", (error as any)?.code);
-                console.error("error.status:", (error as any)?.status);
+                const supaErr = error as unknown as {
+                    message?: string;
+                    details?: string;
+                    hint?: string;
+                    code?: string;
+                    status?: number;
+                };
+                console.error("error.message:", supaErr.message);
+                console.error("error.details:", supaErr.details);
+                console.error("error.hint:", supaErr.hint);
+                console.error("error.code:", supaErr.code);
+                console.error("error.status:", supaErr.status);
             } finally {
                 setLoading(false);
             }

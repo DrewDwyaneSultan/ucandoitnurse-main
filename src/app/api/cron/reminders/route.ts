@@ -3,11 +3,15 @@ import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 import { Resend } from "resend";
 
-// Initialize Supabase with service role for cron access
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Helper to create Supabase client when needed (avoids build-time env requirements)
+function getSupabaseClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+        throw new Error("Missing Supabase environment variables");
+    }
+    return createClient(url, key);
+}
 
 // Initialize web-push
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
@@ -39,6 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+        const supabase = getSupabaseClient();
         const now = new Date();
         const today = now.toISOString().split('T')[0];
 
