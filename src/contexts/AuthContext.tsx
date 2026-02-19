@@ -58,10 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const signInWithGoogle = useCallback(async () => {
+        // allow overriding the redirect URL via env var for production
+        const redirectToUrl =
+            process.env.NEXT_PUBLIC_APP_REDIRECT_URL || `${window.location.origin}/dashboard`;
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${window.location.origin}/dashboard`,
+                redirectTo: redirectToUrl,
                 queryParams: {
                     access_type: "offline",
                     prompt: "consent",
