@@ -33,6 +33,12 @@ export function FavoriteFlashcardsList({ userId }: FavoriteFlashcardsListProps) 
                 setFavorites(data || []);
             } catch (error) {
                 console.error("Error fetching favorites:", error);
+                // Log detailed fields from Supabase error objects for debugging
+                console.error("error.message:", (error as any)?.message);
+                console.error("error.details:", (error as any)?.details);
+                console.error("error.hint:", (error as any)?.hint);
+                console.error("error.code:", (error as any)?.code);
+                console.error("error.status:", (error as any)?.status);
             } finally {
                 setLoading(false);
             }
