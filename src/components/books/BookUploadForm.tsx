@@ -82,13 +82,28 @@ export function BookUploadForm({ userId, onUploadComplete }: BookUploadFormProps
             formData.append("userId", userId);
             formData.append("title", title || file.name.replace(/\.pdf$/i, ""));
 
+            // Vercel's serverless functions have a ~5MB body limit, so
+            // reject larger files early with a helpful message.
+            const SERVER_MAX = 5 * 1024 * 1024;
+            if (file.size > SERVER_MAX) {
+                throw new Error("File too large for serverless upload (max 5MB). Please split it or use a smaller file.");
+            }
+
             const uploadRes = await fetch("/api/books/upload", {
                 method: "POST",
                 body: formData,
             });
 
             if (!uploadRes.ok) {
-                const data = await uploadRes.json();
+                // attempt to parse JSON, fall back to text
+                let data: any;
+                const contentType = uploadRes.headers.get("content-type") || "";
+                if (contentType.includes("application/json")) {
+                    data = await uploadRes.json();
+                } else {
+                    const text = await uploadRes.text();
+                    data = { error: text };
+                }
                 throw new Error(data.error || "Upload failed");
             }
 
