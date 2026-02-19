@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:0.4"/>
+      <stop offset="50%" style="stop-color:#FDE68A;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#FBBF24;stop-opacity:0.1"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.5" fill="#F59E0B" opacity="0.15"/>
+    </pattern>
+    <linearGradient id="trophy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FBBF24;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:0.15"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg)"/>
+  <rect width="400" height="400" fill="url(#grid)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="350" cy="50" r="80" fill="url(#trophy)" opacity="0.5"/>
+  <circle cx="50" cy="350" r="60" fill="url(#trophy)" opacity="0.3"/>
+  
+  <!-- Stars -->
+  <polygon points="320,30 325,45 340,45 328,55 333,70 320,60 307,70 312,55 300,45 315,45" fill="#FBBF24" opacity="0.3"/>
+  <polygon points="60,320 63,330 75,330 66,337 70,347 60,340 50,347 54,337 45,330 57,330" fill="#FBBF24" opacity="0.25"/>
+  <polygon points="380,200 383,208 392,208 385,214 388,222 380,217 372,222 375,214 368,208 377,208" fill="#F59E0B" opacity="0.2"/>
+  
+  <!-- Medal decorations -->
+  <circle cx="370" cy="380" r="25" fill="none" stroke="#FBBF24" stroke-width="2" opacity="0.2"/>
+  <circle cx="30" cy="30" r="20" fill="none" stroke="#F59E0B" stroke-width="1.5" opacity="0.2"/>
+</svg>
