@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, Lock, X } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 import { AI_MODELS, type AIModelId, DEFAULT_MODEL } from "@/lib/ai-models";
 import Image from "next/image";
 
@@ -30,6 +30,7 @@ export function ModelSelector({
     const isDark = variant === "dark";
 
     const isModelLocked = (modelId: AIModelId) => {
+        void modelId;
         return false; // no locks, all models available
     };
 

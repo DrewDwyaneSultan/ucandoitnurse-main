@@ -97,6 +97,7 @@ export async function getUserCredits(
     userId: string
 ): Promise<UserCredits> {
     // Pricing removed: always return unlimited/free credits
+    void userId;
     const today = new Date().toISOString().split("T")[0];
     return {
         creditsUsed: 0,
@@ -107,21 +108,12 @@ export async function getUserCredits(
     };
 }
 
-function getDefaultCredits(plan: SubscriptionPlan): UserCredits {
-    return {
-        creditsUsed: 0,
-        creditsLimit: PLAN_CONFIGS[plan].dailyCredits,
-        creditsRemaining: PLAN_CONFIGS[plan].dailyCredits,
-        resetDate: new Date().toISOString().split("T")[0],
-        plan,
-    };
-}
-
 /**
  * Check if user has credits available (without using them)
  */
 export async function hasCreditsAvailable(userId: string): Promise<boolean> {
     // always true now that everything is free
+    void userId;
     return true;
 }
 
@@ -140,6 +132,8 @@ export async function consumeCredit(
     metadata: Record<string, unknown> = {},
 ): Promise<UseCreditsResult> {
     // no-op: always succeed and return huge remaining
+    void actionType;
+    void metadata;
     if (!userId) {
         return { success: false, creditsRemaining: 0, message: "User not authenticated" };
     }
@@ -151,6 +145,7 @@ export async function consumeCredit(
  */
 export async function canUploadBook(userId: string): Promise<{ allowed: boolean; message: string; currentCount: number; limit: number }> {
     // always allow uploads unlimited
+    void userId;
     return { allowed: true, message: "OK", currentCount: 0, limit: Number.MAX_SAFE_INTEGER };
 }
 
@@ -163,6 +158,7 @@ export async function canUploadBook(userId: string): Promise<{ allowed: boolean;
  */
 export async function getUserSubscription(userId: string) {
     // subscriptions removed
+    void userId;
     return null;
 }
 
@@ -258,7 +254,4 @@ export async function cancelSubscription(userId: string) {
         .eq("user_id", userId);
 }
 
-// Fix typo
-function getDefaultCredics(plan: SubscriptionPlan): UserCredits {
-    return getDefaultCredits(plan);
-}
+// (legacy) pricing/credits helpers removed

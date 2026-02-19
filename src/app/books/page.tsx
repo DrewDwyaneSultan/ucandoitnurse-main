@@ -283,7 +283,7 @@ export default function BooksPage() {
                                             } else {
                                                 toast.error(data.error || 'Could not add demo data');
                                             }
-                                        } catch (e) {
+                                        } catch {
                                             toast.error('Network error');
                                         }
                                     }}

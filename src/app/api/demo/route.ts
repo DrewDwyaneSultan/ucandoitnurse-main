@@ -1,10 +1,10 @@
 import { createServerClient } from "@/lib/supabase";
 import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
+export async function POST() {
     const supabase = createServerClient();
     // grab user from auth cookie
     const { data: { user } } = await supabase.auth.getUser();
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "User already has books" });
         }
 
-        const bookId = uuidv4();
+        const bookId = randomUUID();
         const { data: book, error: bookError } = await supabase
             .from("books")
             .insert({
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
         const flashcards = [
             {
-                id: uuidv4(),
+                id: randomUUID(),
                 user_id: user.id,
                 book_id: bookId,
                 topic: "Nursing Fundamentals",
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
                 difficulty: "easy",
             },
             {
-                id: uuidv4(),
+                id: randomUUID(),
                 user_id: user.id,
                 book_id: bookId,
                 topic: "Nursing Fundamentals",

@@ -23,7 +23,6 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import type { Book, Flashcard } from "@/types/database.types";
-import Link from "next/link";
 
 export default function BookDetailPage() {
     const router = useRouter();

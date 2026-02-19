@@ -54,6 +54,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.26",
     "genkit": "^1.25.0",
@@ -77,6 +78,7 @@
     "superjson": "^2.2.6",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
+    "uuid": "^13.0.0",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
     "zod": "^4.1.13"
@@ -87,6 +89,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",

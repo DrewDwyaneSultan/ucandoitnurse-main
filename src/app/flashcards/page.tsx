@@ -99,7 +99,7 @@ function FlashcardsContent() {
             setGenerating(false);
             setLoading(false);
         }
-    }, [user?.id, selectedModel, router]);
+    }, [user?.id, selectedModel]);
 
 
     const fetchData = useCallback(async () => {

@@ -9,6 +9,7 @@ import { UsageLimitModal, isRateLimitError } from "@/components/ui/usage-limit-m
 import { Upload, FileText, X, CheckCircle, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface BookUploadFormProps {
     userId: string;

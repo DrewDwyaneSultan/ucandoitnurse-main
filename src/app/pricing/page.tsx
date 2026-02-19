@@ -7,7 +7,7 @@ export default function PricingPage() {
     return (
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="max-w-xl text-center">
-                <h1 className="text-4xl font-bold mb-4">Everything's Free!</h1>
+                <h1 className="text-4xl font-bold mb-4">Everything&apos;s Free!</h1>
                 <p className="text-lg text-gray-600 mb-6">
                     We removed all paywalls – feel free to explore and generate as many flashcards as you like.
                 </p>

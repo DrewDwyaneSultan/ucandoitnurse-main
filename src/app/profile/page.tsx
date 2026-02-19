@@ -9,7 +9,6 @@ import {
     ArrowLeft,
     AtSign,
     CalendarClock,
-    Gem,
     PenLine,
     CheckCheck,
     XCircle,
@@ -18,7 +17,6 @@ import {
     FileStack,
     GalleryVerticalEnd,
     Workflow,
-    ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
